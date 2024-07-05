@@ -1,14 +1,27 @@
 import { ToastContainer } from 'react-toastify'
-import useRouteElement from './useRouteElements'
-import 'react-toastify/dist/ReactToastify.css'
+import { useEffect, useContext } from 'react'
+import { LocalStorageEventTarget } from './utils/auth'
+import { AppContext } from './contexts/app.context'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { HelmetProvider } from 'react-helmet-async'
+import useRouteElements from './useRouteElements'
 
 function App() {
-  const routeElements = useRouteElement()
+  const routeElements = useRouteElements()
+  const { reset } = useContext(AppContext)
+  useEffect(() => {
+    LocalStorageEventTarget.addEventListener('clearLS', reset)
+    return () => {
+      LocalStorageEventTarget.removeEventListener('clearLS', reset)
+    }
+  }, [reset])
+
   return (
-    <div>
+    <HelmetProvider>
       {routeElements}
       <ToastContainer />
-    </div>
+      <ReactQueryDevtools initialIsOpen={false} />
+    </HelmetProvider>
   )
 }
 
